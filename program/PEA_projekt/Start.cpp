@@ -3,6 +3,7 @@
 #include "BranchAndBound.hpp"
 #include "BruteForce.hpp"
 #include "DynamicProgramming.hpp"
+#include "Genetic.hpp"
 #include "SimAnn.hpp"
 #include "TabuSearch.hpp"
 #include <iostream>
@@ -121,8 +122,8 @@ void Start::chooseAlgorithm(std::string user_inp){
                         input_right = false;
                         break;
                     }
-                    size = ch - 48;
                 }
+                size = stoi(character);
                 
                 if(input_right == false){
                     std::cout << std::endl << "The chosen input is not correct!" << std::endl;
@@ -253,6 +254,7 @@ void Start::chooseAlgorithm(std::string user_inp){
     std::cout << "2. Brute Force" << std::endl;
     std::cout << "3. Simulated Annealing" << std::endl;
     std::cout << "4. Tabu Search" << std::endl;
+    std::cout << "5. Genetic algorithm" << std::endl;
 
     long long int frequency, start, elapsed;
     QueryPerformanceFrequency((LARGE_INTEGER *)&frequency);
@@ -266,7 +268,7 @@ void Start::chooseAlgorithm(std::string user_inp){
 
                 input_right = true;
                 for (auto &ch : user_inp){
-                    if(ch < '0' || ch > '4'){
+                    if(ch < '0' || ch > '5'){
                         input_right = false;
                         break;
                     }
@@ -465,6 +467,114 @@ void Start::chooseAlgorithm(std::string user_inp){
                 } while (tabualg.paramaterSet == 0);
                 
                 break;
+            }
+            case '5':
+            {
+                Genetic alg;
+
+                int parameterSet;
+
+                do{  
+                    std::cout << std::endl << "Do you want to set parameters for Genetic? (1- yes, 0- no): ";
+                    std::cin >> parameterSet;
+
+                    double exec_time;
+                    int populationSize;
+                    double mutationCoef;
+                    double crossoverCoef;
+                    int mutationType;
+                    std::string mutationTypeStr; 
+
+                    std::string exec_time_str;
+                    std::string population_str;
+                    std::string mut_str;
+                    std::string cross_str;
+                    std::string mut_type_str; 
+
+                    bool inp_incorrect;
+                    bool exec_algorithm;
+
+                    if(parameterSet == 1){
+                        std::string str;
+
+                        do{
+                            inp_incorrect = false;
+                            std::cout << "Set stopping criterion (execution time in seconds): ";
+                            std::cin >> exec_time_str;
+                            for (auto &ch : exec_time_str){
+                                if(ch < '0' || ch > '9'){
+                                    if(ch != '.'){
+                                        inp_incorrect = true;
+                                    }
+                                }
+                            }
+                            if(!inp_incorrect)
+                                exec_time = std::stod(exec_time_str);
+
+                            std::cout << "Set population size: ";
+                            std::cin >> population_str;
+                            for (auto &ch : population_str){
+                                if(ch < '0' || ch > '9'){
+                                    inp_incorrect = true;
+                                }
+                            }
+                            if(!inp_incorrect)
+                                populationSize = std::stod(population_str);
+
+                            std::cout << "Set mutation coefficient (recommended- 0.01): ";
+                            std::cin >> mut_str;
+                            for (auto &ch :mut_str){
+                                if(ch < '0' || ch > '9'){
+                                    if(ch != '.'){
+                                        inp_incorrect = true;
+                                    }
+                                }
+                            }
+                            if(!inp_incorrect)
+                                mutationCoef = std::stod(mut_str);
+
+                            std::cout << "Set crossover coefficient (recommended- 0.8): ";
+                            std::cin >> cross_str;
+                            for (auto &ch :cross_str){
+                                if(ch < '0' || ch > '9'){
+                                    if(ch != '.'){
+                                        inp_incorrect = true;
+                                    }
+                                }
+                            }
+                            if(!inp_incorrect)
+                                crossoverCoef = std::stod(cross_str);
+
+                            std::cout << "Set mutation type (1. transposition, 2. inversion): ";
+                            std::cin >> mut_type_str;
+                            for (auto &ch : mut_type_str){
+                                if(ch < '1' || ch > '2'){
+                                    inp_incorrect = true;
+                                }
+                            }
+                            if(!inp_incorrect)
+                                mutationType = std::stod(mut_type_str);
+                            if(mutationType == 1)
+                                mutationTypeStr = "transposition";
+                            else if(mutationType == 2)
+                                mutationTypeStr = "inversion";
+
+                            if(inp_incorrect)
+                                std::cout << std::endl <<"Some of the inputs may have invalid format!" << std::endl << std::endl;
+                        }while(inp_incorrect);
+
+                        Genetic::setParameters(crossoverCoef, mutationCoef, populationSize, mutationTypeStr, exec_time);
+
+                    }
+
+                    if(alg.paramaterSet == 1){
+                        alg.algorithm(matrix);
+                        alg.showResult();
+                    }
+                    else{
+                        std::cout << "You need to set parameters first before algorithm starts!" <<std::endl;
+                    }
+                } while (alg.paramaterSet == 0);
             }
         }
     }
